@@ -79,8 +79,28 @@ else ()
    set(HILTI_HAVE_SANITIZER "no" CACHE BOOL "Using sanitizer")
 endif()
 
+if ( USE_FUZZING )
+    include(CheckSourceCompiles)
+
+    set(CMAKE_REQUIRED_FLAGS "-fsanitize=fuzzer")
+    set(CMAKE_REQUIRED_LINK_OPTIONS "-fsanitize=fuzzer")
+    check_source_compiles(C "
+    #include <stdint.h>
+    #include <stdlib.h>
+
+    int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {}
+    " COMPILER_HAS_FUZZER)
+
+    if ( NOT COMPILER_HAS_FUZZER )
+        message(FATAL_ERROR "Fuzzing requested, but not supported")
+    endif()
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer")
+    set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} -fsanitize=fuzzer")
+endif()
+
 if ( USE_WERROR )
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${werror_flags}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${werror_flags}")
     set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} ${werror_flags}")
 endif ()
 
@@ -170,6 +190,7 @@ enable_testing()
 add_subdirectory(hilti)
 add_subdirectory(spicy)
 add_subdirectory(scripts)
+add_subdirectory(ci/fuzz)
 
 option(BUILD_ZEEK_PLUGIN "Whether to build Zeek spicy-plugin and spicy-analyzers as submodules. Their preferred installation method is via 'zkg'." OFF)
 
@@ -258,6 +279,7 @@ message(
     "\n"
     "\nBuilding toolchain:    ${HAVE_TOOLCHAIN}"
     "\nBuilding Zeek support: ${HAVE_ZEEK_PLUGIN}"
+    "\nBuilding fuzzers:      ${USE_FUZZING}"
     "\n"
     "\nUse ccache:            ${USE_CCACHE}"
     "\nUse gold linker:       ${GOLD_FOUND}"
