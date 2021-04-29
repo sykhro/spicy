@@ -95,8 +95,8 @@ if ( USE_FUZZING )
         message(FATAL_ERROR "Fuzzing requested, but not supported")
     endif()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer")
-    set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} -fsanitize=fuzzer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer-no-link")
+    set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} -fsanitize=fuzzer-no-link")
 endif()
 
 if ( USE_WERROR )
