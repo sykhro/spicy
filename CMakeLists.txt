@@ -80,23 +80,8 @@ else ()
 endif()
 
 if ( USE_FUZZING )
-    include(CheckSourceCompiles)
-
-    set(CMAKE_REQUIRED_FLAGS "-fsanitize=fuzzer")
-    set(CMAKE_REQUIRED_LINK_OPTIONS "-fsanitize=fuzzer")
-    check_source_compiles(C "
-    #include <stdint.h>
-    #include <stdlib.h>
-
-    int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {}
-    " COMPILER_HAS_FUZZER)
-
-    if ( NOT COMPILER_HAS_FUZZER )
-        message(FATAL_ERROR "Fuzzing requested, but not supported")
-    endif()
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer")
-    set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} -fsanitize=fuzzer")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=fuzzer-no-link")
+    set(EXTRA_CXX_FLAGS "${EXTRA_CXX_FLAGS} -fsanitize=fuzzer-no-link")
 endif()
 
 if ( USE_WERROR )

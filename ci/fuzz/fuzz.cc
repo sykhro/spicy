@@ -12,7 +12,6 @@
 #include "hilti/rt/exception.h"
 #include "hilti/rt/type-info.h"
 
-
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
     static const spicy::rt::Parser* parser = nullptr;
 
