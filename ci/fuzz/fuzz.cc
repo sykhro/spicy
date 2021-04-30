@@ -4,13 +4,13 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <hilti/rt/exception.h>
 #include <hilti/rt/init.h>
+#include <hilti/rt/types/reference.h>
+#include <hilti/rt/types/stream.h>
 
 #include <spicy/rt/init.h>
 #include <spicy/rt/parser.h>
-
-#include "hilti/rt/exception.h"
-#include "hilti/rt/type-info.h"
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
     static const spicy::rt::Parser* parser = nullptr;
