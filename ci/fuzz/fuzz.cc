@@ -26,8 +26,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
     hilti::rt::ValueReference<hilti::rt::Stream> stream;
     stream->append(reinterpret_cast<const char*>(Data), Size);
 
+    hilti::rt::ValueReference<spicy::rt::ParsedUnit> pu;
+
     try {
-        (*parser->parse1)(stream, {}, {});
+        assert(parser->parse1 || parser->parse3);
+        if ( parser->parse1 )
+            parser->parse1(stream, {}, {});
+        else if ( parser->parse3 )
+            parser->parse3(pu, stream, {}, {});
     } catch ( const spicy::rt::ParseError& ) {
     } catch ( const hilti::rt::StackSizeExceeded& ) { // FIXME(bbannier): should we trigger this on small inputs?
     }
