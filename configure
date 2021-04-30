@@ -12,7 +12,7 @@ cmake_build_shared_libs="yes"
 cmake_build_toolchain="yes"
 cmake_build_type="RelWithDebInfo"
 cmake_build_zeek_plugin="no"
-cmake_compiler_rt_libdir=""
+cmake_clang_fuzzer_no_main=""
 cmake_c_compiler=""
 cmake_cxx_compiler=""
 cmake_flex_root=""
@@ -73,7 +73,7 @@ Usage: $0 [OPTION]... [VAR=VALUE]...
     --with-cxx-compiler=<path>         Set C++ compiler to use
     --with-flex=<prefix>               Set prefix of Flex installation
     --with-zeek=PATH                   Path to Zeek installation [default: ${cmake_zeek_root_dir}]
-    --with-compiler-rt-libdir=PATH     Path to directory containing Clang's compiler-rt libraries for fuzzing [default: ${cmake_compiler_rt_libdir}]
+    --with-clang-fuzzer-no-main=PATH   Path to Clang's libclang_rt.fuzzer_no_main*.a for fuzzing [default: ${cmake_clang_fuzzer_no_main}]
 
     --display-cmake                    Don't create build configuration, just output final CMake invocation
 "
@@ -139,7 +139,7 @@ while [ $# -ne 0 ]; do
         --with-flex=*)                     cmake_flex_root="${optarg}";;
         --with-bison=*)                    cmake_bison_root="${optarg}";;
         --with-zeek=*)                     cmake_zeek_root_dir="${optarg}";;
-        --with-compiler-rt-libdir=*)       cmake_compiler_rt_libdir="${optarg}";;
+        --with-clang-fuzzer-no-main=*)     cmake_clang_fuzzer_no_main="${optarg}";;
         --without-bison=*)                 cmake_bison_root="";;
         --without-flex=*)                  cmake_flex_root="";;
         --without-zeek)                    cmake_zeek_root_dir="";;
@@ -161,7 +161,7 @@ append_cache_entry CMAKE_BUILD_TYPE             STRING "${cmake_build_type}"
 append_cache_entry CMAKE_C_COMPILER             PATH   "${cmake_c_compiler}"
 append_cache_entry CMAKE_CXX_COMPILER           PATH   "${cmake_cxx_compiler}"
 append_cache_entry CMAKE_INSTALL_PREFIX         PATH   "${cmake_install_prefix}"
-append_cache_entry COMPILER_RT_LIBDIR           PATH   "${cmake_compiler_rt_libdir}"
+append_cache_entry CLANG_FUZZER_NO_MAIN         PATH   "${cmake_clang_fuzzer_no_main}"
 append_cache_entry FLEX_ROOT                    PATH   "${cmake_flex_root}"
 append_cache_entry SPICY_ZEEK_INSTALL_PLUGIN    BOOL   "${cmake_zeek_install_plugin}"
 append_cache_entry USE_CCACHE                   BOOL   "${cmake_use_ccache}"
