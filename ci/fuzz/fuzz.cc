@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <optional>
 
 #include <hilti/rt/exception.h>
 #include <hilti/rt/init.h>
@@ -12,6 +13,8 @@
 #include <spicy/rt/init.h>
 #include <spicy/rt/parser.h>
 
+std::optional<std::string> name;
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
     static const spicy::rt::Parser* parser = nullptr;
 
@@ -19,8 +22,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
         hilti::rt::init();
         spicy::rt::init();
 
-        for ( auto* p : spicy::rt::parsers() )
+        for ( auto* p : spicy::rt::parsers() ) {
             parser = p;
+            if ( name && p->name == *name )
+                break;
+        }
     }
 
     assert(parser);
@@ -39,6 +45,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
             parser->parse3(pu, stream, {}, {});
     } catch ( const spicy::rt::ParseError& ) {
     } catch ( const hilti::rt::StackSizeExceeded& ) { // FIXME(bbannier): should we trigger this on small inputs?
+    } catch ( ... ) {
     }
 
     return 0; // Non-zero return values are reserved for future use.
@@ -47,4 +54,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size) {
 extern "C" int LLVMFuzzerRunDriver(int* argc, char*** argv, int (*UserCb)(const uint8_t* Data, size_t Size));
 
 // We provide our own `main` to avoid linking to hilti-rt's weak `main` symbol.
-int main(int argc, char** argv) { LLVMFuzzerRunDriver(&argc, &argv, LLVMFuzzerTestOneInput); }
+int main(int argc, char** argv) {
+    if ( const char* n = std::getenv("SPICY_FUZZ_PARSER") )
+        name = n;
+
+    LLVMFuzzerRunDriver(&argc, &argv, LLVMFuzzerTestOneInput);
+}
